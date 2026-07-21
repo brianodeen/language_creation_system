@@ -1,0 +1,72 @@
+[
+  {
+    "word": "water",
+    "en": "water",
+    "pos": "noun",
+    "grammar": "core element",
+    "chapter": 1,
+    "notes": "Essential natural element (Swadesh baseline)",
+    "ipa": "",
+    "manufactured": false
+  },
+  {
+    "word": "fire",
+    "en": "fire",
+    "pos": "noun",
+    "grammar": "core element",
+    "chapter": 1,
+    "notes": "Energy and heat source",
+    "ipa": "",
+    "manufactured": false
+  },
+  {
+    "word": "sun",
+    "en": "sun",
+    "pos": "noun",
+    "grammar": "celestial",
+    "chapter": 1,
+    "notes": "Day star / daylight source",
+    "ipa": "",
+    "manufactured": false
+  },
+  {
+    "word": "person",
+    "en": "person, human being",
+    "pos": "noun",
+    "grammar": "social class",
+    "chapter": 1,
+    "notes": "Human individual",
+    "ipa": "",
+    "manufactured": false
+  },
+  {
+    "word": "house",
+    "en": "house, home, dwelling",
+    "pos": "noun",
+    "grammar": "inanimate class",
+    "chapter": 2,
+    "notes": "Shelter & residence",
+    "ipa": "",
+    "manufactured": false
+  },
+  {
+    "word": "computer",
+    "en": "computer, calculation system",
+    "pos": "noun",
+    "grammar": "compound / modern",
+    "chapter": 99,
+    "notes": "Modern term ('reckoning device')",
+    "ipa": "",
+    "manufactured": true
+  },
+  {
+    "word": "internet",
+    "en": "internet, global network",
+    "pos": "noun",
+    "grammar": "compound / modern",
+    "chapter": 99,
+    "notes": "Modern term ('world net')",
+    "ipa": "",
+    "manufactured": true
+  }
+]
