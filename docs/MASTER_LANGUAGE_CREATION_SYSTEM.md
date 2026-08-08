@@ -31,6 +31,47 @@ flowchart TD
 
 ---
 
+## Operational Workflows: Book Set Generation
+
+This framework supports two direct operational pathways. When requesting book generation, specify either a historical language or detailed stylistic inputs for a constructed language.
+
+### Workflow A: Generating Books for an Existing or Historical Language
+Use this pathway when compiling resources for a natural language (e.g. *Old English, Latin, Gothic, Old Norse*).
+*   **Trigger Command**: `"make a set of language books for language: [Language Name]"`
+*   **Required User Inputs**:
+    1.  **Lexicon File** (`data/vocabulary.json`): A JSON database containing the real words, parts of speech, translations, and chapter categorizations.
+    2.  **Orthography Rules**: Specific spelling, accent, or length mark protocols.
+*   **System Execution Steps**:
+    1.  **Phonetic Adaptations**: Edit `scripts/transcribe_ipa.py` to match the phonology of the target language (e.g., adding digraph replacements or context-sensitive voicing).
+    2.  **Sorting Configurations**: Update `CHAR_PRIORITY_MAP` in `scripts/build_books.py` to reflect the traditional alphabetical order of the language.
+    3.  **Drafting Chapters**: Write the grammar explanations in `book_1_grammar/`, inserting `<!-- CHAPTER_GLOSSARY_START -->` placeholders.
+    4.  **Book Compilation**: Run the glossary compiler:
+        ```bash
+        python scripts/build_books.py
+        ```
+    5.  **PDF Generation**: Compile the styled volumes:
+        ```bash
+        python scripts/build_latex.py
+        ```
+
+### Workflow B: Generating Books for a New Artificial Language (Conlang)
+Use this pathway when creating a constructed language from scratch based on a set of visual and phonetic style parameters (e.g., *Feline, Elvish, Cyberpunk, Dwarven*).
+*   **Trigger Command**: `"create a set of language books for a new artificial language of this style: [Style Details]"`
+*   **Required User Inputs**:
+    1.  **Phonological Inventory & Script Style**: The symbol catalog (e.g. 28 feline sounds, angular runes, or custom OpenType glyph mappings).
+    2.  **Morphosyntactic Rules**: Desired syntax (e.g., V2 word order, agglutinative compounding, prefix/suffix noun classes).
+*   **System Execution Steps**:
+    1.  **Configure Seed Engine**: Update `scripts/phonetic_matcher.py` with the candidate script symbols and the 10-language concept fit matrix.
+    2.  **Generate Vocabulary**: Execute the algorithmic stem generator (usually `scripts/generate_vocab.py`) to synthesize a zero-collision lexicon of 10,000+ words matching the style, writing them to `data/vocabulary.json`.
+    3.  **Develop Learning Guide**: Write lesson drafts explaining the conlang's syntax and rules in `book_1_grammar/`.
+    4.  **Auto-Compile & Typeset**: Run the glossary builder and XeLaTeX compiler to output the finished PDFs:
+        ```bash
+        python scripts/build_books.py
+        python scripts/build_latex.py
+        ```
+
+---
+
 ## Phase 1: Script, Symbol & Orthography Engineering
 
 ### 1.1 Custom Alphabet & Script Options: Decision Matrix & Execution Manual

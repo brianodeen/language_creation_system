@@ -16,7 +16,14 @@ try:
 except AttributeError:
     pass
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+def resolve_base_dir() -> str:
+    """Resolves base directory to support both direct cloned repositories and git submodules."""
+    cwd = os.getcwd()
+    if os.path.exists(os.path.join(cwd, "data", "vocabulary.json")) or os.path.exists(os.path.join(cwd, "book_1_grammar")):
+        return cwd
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BASE_DIR = resolve_base_dir()
 VOCAB_FILE = os.path.join(BASE_DIR, "data", "vocabulary.json")
 BOOK1_DIR = os.path.join(BASE_DIR, "book_1_grammar")
 BOOK2_DIR = os.path.join(BASE_DIR, "book_2_dictionary")
