@@ -89,27 +89,29 @@ If you specified: **"make a set of language books for language: Latin"**
 
 If you specified: **"create a set of language books for a new artificial language of this style: Elvish"**
 
-#### Step 1: Define the Style & Stems
-1.  Determine your conlang's glyph catalog or character set (Option 1, 2, or 3 from the Master Script Decision Matrix).
-2.  Open `scripts/phonetic_matcher.py` and populate the `CONCEPT_MULTILINGUAL_MAP` with target concept spellings across the 10 reference language families.
-3.  Implement the phonetic-fit scoring algorithm in `calculate_phonetic_fit_score()` to evaluate how closely candidate stems match the desired acoustic style.
+#### Step 1: Complete the Idea Elicitation Protocol
+1.  Review [docs/CONLANG_IDEA_ELICITATION_PROTOCOL.md](file:///c:/Users/brian/Documents/antigravity/language_creation_system/docs/CONLANG_IDEA_ELICITATION_PROTOCOL.md) with the assistant.
+2.  Define the **Aesthetic Soul**, phoneme inventory, syllable shapes (e.g. `CV`, `CVC`), forbidden cluster rules, and cultural worldview metaphors.
+3.  Establish the morphological typology (Agglutinative, Fusional, Isolating) and clause syntax (V2, SVO, SOV).
 
-#### Step 2: Algorithmic Lexicon Generation
-1.  Configure `scripts/generate_vocab.py` with your syllable structures, vowel/consonant weight rules, and prefix/suffix morphological additions.
-2.  Run the generator to compile your conlang's vocabulary:
+#### Step 2: Configure the Organic Lexicon Engine
+1.  Open `scripts/organic_lexicon_engine.py`.
+2.  Set up the `PhonotacticProfile` with your conlang's allowed consonants, vowels, diphthongs, and syllable templates.
+3.  Customize the `DERIVATIONAL_AFFIXES` map (Agentive, Instrumental, Locative, Diminutive, etc.).
+4.  Run the organic synthesis engine to generate atomic roots and semantic compounds with automatic anti-Anglicism verification:
     ```bash
-    python scripts/generate_vocab.py
+    python scripts/organic_lexicon_engine.py
     ```
-    This automatically exports a finished `data/vocabulary.json` file populated with generated words, IPA, and translations.
+    This outputs a rich `data/vocabulary.json` database with etymological derivations, literal compound translations, and Leipzig-glossed example sentences.
 
 #### Step 3: Integrate the Conversation Guide
 1.  Navigate to `templates/conversation_guide/`.
-2.  Open the categories relevant to your story or setting.
-3.  Copy the baseline English dialogues and translate them into your generated conlang vocabulary using the grammar guidelines specified in the file's **Grammatical Mapping & Analysis** section.
+2.  Select the relevant dialogue categories (e.g. `01_greetings_protocol.md`, `06_conflict_warfare.md`, `24_supernatural_magic.md`).
+3.  Translate the baseline English dialogues into your conlang's generated vocabulary, following the grammar blueprints provided in each template's **Grammatical Mapping & Analysis** section.
 
-#### Step 4: Typeset and Publish
-1.  Adjust your page layouts and color schemes (e.g. changing colors to match your conlang's mood) inside `scripts/build_latex.py`.
-2.  Run the build scripts to compile the finished multi-volume PDF collection:
+#### Step 4: Typeset and Publish the Multi-Volume Suite
+1.  Adjust page trim geometry, color palettes (parchment/burgundy), and fonts inside `scripts/build_latex.py`.
+2.  Execute the automated build pipeline to compile your lessons, rich dictionaries, phrasebooks, and PDFs:
     ```bash
     python scripts/build_books.py
     python scripts/build_latex.py

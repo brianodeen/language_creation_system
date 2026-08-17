@@ -106,35 +106,67 @@ def update_chapter_glossaries(vocab: list):
                 print(f"  Updated glossary in {filename} (Chapter {ch_num}).")
 
 def build_dictionaries(vocab: list):
-    """Compiles bidirectional target-to-English and English-to-target dictionary markdown files."""
+    """Compiles bidirectional target-to-English and English-to-target dictionary markdown files with rich lexicographical data."""
     if not os.path.exists(BOOK2_DIR):
         os.makedirs(BOOK2_DIR, exist_ok=True)
         
-    print("Compiling Book 2 Dictionaries...")
+    print("Compiling Book 2 Dictionaries with Rich Lexicographical Formatting...")
     # 1. Target -> English Dictionary
     target_sorted = sorted(vocab, key=lambda w: get_alphabetical_sort_key(w.get('word', w.get('oe', ''))))
     target_to_en_path = os.path.join(BOOK2_DIR, "target_to_en.md")
     
-    t_lines = ["# Target Language to English Dictionary\n"]
+    t_lines = [
+        "# Target Language to English Dictionary",
+        "**Comprehensive Lexicographical Edition with Etymological Derivations and Leipzig Interlinear Glosses**\n",
+        "---"
+    ]
     current_group = None
     for entry in target_sorted:
         w_str = entry.get('word', entry.get('oe', ''))
+        ipa_str = f"`{entry.get('ipa', '')}`" if entry.get('ipa') else ""
         group = get_letter_group(w_str)
         if group != current_group:
             current_group = group
-            t_lines.append(f"\n## {current_group}\n")
-        m_tag = " [Manufactured Word]" if entry.get('manufactured') else ""
-        t_lines.append(f"- **{w_str}** `{entry.get('ipa','')}` *{entry.get('pos','')}* - {entry.get('en','')}{m_tag} ({entry.get('notes','')})")
+            t_lines.append(f"\n# {current_group}\n")
+            
+        m_tag = " `[Manufactured / Coined]`" if entry.get('manufactured') else ""
+        pos_info = f"*{entry.get('pos', 'noun')}*"
+        if entry.get('grammar'):
+            pos_info += f" ({entry.get('grammar')})"
+            
+        t_lines.append(f"### **{w_str}** {ipa_str} {pos_info}{m_tag}")
+        t_lines.append(f"- **Definition:** {entry.get('en', '')}")
+        
+        if entry.get('etymology'):
+            etym_str = f"- **Etymology:** {entry.get('etymology')}"
+            if entry.get('literal'):
+                etym_str += f" *(Literal: \"{entry.get('literal')}\")*"
+            t_lines.append(etym_str)
+            
+        if entry.get('example_target'):
+            t_lines.append(f"- **Example Sentence:** *{entry.get('example_target')}*")
+            if entry.get('example_gloss'):
+                t_lines.append(f"  - `GLOSS:` `{entry.get('example_gloss')}`")
+            if entry.get('example_en'):
+                t_lines.append(f"  - `TRANSLATION:` \"{entry.get('example_en')}\"")
+                
+        if entry.get('notes'):
+            t_lines.append(f"- **Notes:** {entry.get('notes')}")
+        t_lines.append("")
         
     with open(target_to_en_path, 'w', encoding='utf-8') as f:
         f.write("\n".join(t_lines))
-    print(f"  Created '{target_to_en_path}'.")
+    print(f"  Created rich dictionary at '{target_to_en_path}'.")
     
     # 2. English -> Target Dictionary
     en_sorted = sorted(vocab, key=lambda w: w.get('en', '').lower())
     en_to_target_path = os.path.join(BOOK2_DIR, "en_to_target.md")
     
-    e_lines = ["# English to Target Language Dictionary\n"]
+    e_lines = [
+        "# English to Target Language Dictionary",
+        "**Reverse Lookup & Composition Index**\n",
+        "---"
+    ]
     current_en_group = None
     for entry in en_sorted:
         en_str = entry.get('en', '')
@@ -143,8 +175,11 @@ def build_dictionaries(vocab: list):
             current_en_group = group
             e_lines.append(f"\n## {current_en_group}\n")
         w_str = entry.get('word', entry.get('oe', ''))
-        m_tag = " [Manufactured Word]" if entry.get('manufactured') else ""
-        e_lines.append(f"- **{en_str}**: **{w_str}** `{entry.get('ipa','')}` *{entry.get('pos','')}*{m_tag} ({entry.get('notes','')})")
+        ipa_str = f"`{entry.get('ipa', '')}` " if entry.get('ipa') else ""
+        pos_str = f"*{entry.get('pos', '')}*"
+        m_tag = " [Coined]" if entry.get('manufactured') else ""
+        etym_note = f" [Etym: {entry.get('etymology')}]" if entry.get('etymology') else ""
+        e_lines.append(f"- **{en_str}**: **{w_str}** {ipa_str}{pos_str}{m_tag}{etym_note}")
         
     with open(en_to_target_path, 'w', encoding='utf-8') as f:
         f.write("\n".join(e_lines))

@@ -238,21 +238,26 @@ def transcribe_to_ipa(word: str) -> str:
 
 ---
 
-## Phase 3: Lexicon Generation & Multilingual Sound-Fit Engine
+## Phase 3: Lexicon Generation & Organic Root Engine
 
-### 3.1 Single-Source JSON Schema (`data/vocabulary.json`)
-All vocabulary across all lessons, dictionaries, and phrasebooks must be stored in a single JSON file.
+### 3.1 Enriched Single-Source JSON Schema (`data/vocabulary.json`)
+To ensure maximum lexicographical and grammatical rigor, all vocabulary entries must reside in a unified JSON database with full etymologies and Leipzig-glossed example sentences:
 
 ```json
 [
   {
-    "oe": "ġereċensearu",
-    "en": "computer",
+    "word": "menkalin",
+    "ipa": "/men.kaˈlin/",
     "pos": "noun",
-    "grammar": "neuter strong a-stem",
+    "grammar": "neuter compound (Class 1)",
+    "en": "computer, calculation system",
+    "etymology": "[men \"mind\"] + [kal \"reckon\"] + [-in \"instrumental\"]",
+    "literal": "mind-reckoning-device",
+    "example_target": "Menkalin log-ia solv-en.",
+    "example_gloss": "computer.NOM logic-ACC solve-PRS.3SG",
+    "example_en": "The computer calculates the logic.",
     "chapter": 18,
-    "notes": "modern compound: 'reckoning device'",
-    "ipa": "/jeretʃensearu/",
+    "notes": "Coined modern compound term for computing device",
     "manufactured": true
   }
 ]
@@ -285,24 +290,29 @@ Modern terms (technology, transit, digital life) are generated using 4 systemati
 3. **Calquing**: Structural translation of foreign roots (e.g. *far-sight* = *television*).
 4. **Manufactured Flagging**: Mark coined entries with `"manufactured": true` so compilers auto-append `[Manufactured Word]` in glossaries.
 
-### 3.4 Multi-Tier Stem Depth & Collision Prevention (`generate_vocab.py`)
-To scale lexicons to 10,000+ words without duplicate stems:
-- **Core Stems (Chapters 1-20)**: High-frequency terms use 1-2 syllable atomic stems (`s1`, `s2`).
-- **Expansion Stems (Chapter 99+)**: Secondary concepts dynamically append multi-stem tiers (`s3`, `s4`, `s5`) guaranteed to yield **zero iteration collisions**.
+### 3.4 Organic Root Derivation & Anti-Anglicism Architecture (`organic_lexicon_engine.py`)
+To prevent artificial languages from becoming relexes or borrowing English word fragments, vocabulary is generated strictly via a 4-tier pipeline:
+1. **Phonotactic Constraints**: Words are generated exclusively from allowed syllable shapes (`CV`, `CVC`, `CCV`), banned cluster filters, and sonority sequencing rules.
+2. **Atomic Semantic Primes (200–300 roots)**: Core concepts (nature, bodily parts, motion, cognition) are seeded as atomic root morphemes.
+3. **Productive Derivational Affixes**: Attaching native productive suffixes (Agentive `-ak`, Instrumental `-in`, Locative `-or`, Diminutive `-il`, Augmentative `-on`, Inchoative `-es`, Causative `-ut`, Abstract `-ia`).
+4. **Semantic Compounding**: Higher-order and modern concepts are synthesized through native conceptual recipes (e.g., *hospital* = *heal-sanctuary*, *airplane* = *sky-vessel*).
+5. **Automated Anti-Anglicism Guard**: Every generated headword is scanned against English subword n-grams and forbidden stems to guarantee zero accidental English relexing.
 
 ```python
-_STEM_CACHE = {}
+FORBIDDEN_ENGLISH_SUBSTRINGS = {
+    "comp", "tele", "phone", "graph", "auto", "micro", "macro", "scope",
+    "water", "fire", "earth", "wind", "good", "bad", "light", "dark",
+    "man", "woman", "house", "room", "ship", "craft", "work", "play",
+    "ing", "tion", "able", "ness", "ment", "less", "ful"
+}
 
-def get_unique_compound_headword(concept: str, tier_depth: int) -> str:
-    """Generates guaranteed collision-free headwords by memoizing stem tiers."""
-    cache_key = f"{concept}_{tier_depth}"
-    if cache_key in _STEM_CACHE:
-        return _STEM_CACHE[cache_key]
-    
-    # Synthesize headword from atomic glyph combinations based on depth
-    headword = assemble_stem_tiers(concept, tier_depth)
-    _STEM_CACHE[cache_key] = headword
-    return headword
+def validate_anti_anglicism(conlang_word: str, english_def: str) -> bool:
+    """Verifies that a generated conlang headword contains no English morpheme leaks."""
+    w = conlang_word.lower()
+    for sub in FORBIDDEN_ENGLISH_SUBSTRINGS:
+        if sub in w:
+            return False
+    return True
 ```
 
 ---
@@ -379,6 +389,31 @@ def update_chapter_glossary(chapter_file_path: str, chapter_num: int, vocab_db: 
     with open(chapter_file_path, 'w', encoding='utf-8') as f:
         f.write(updated_content)
 ```
+
+### 5.2 Academic & Pedagogical Standards: Leipzig Interlinear Glossing
+To ensure grammatical explanations and example sentences are academically rigorous and crystal-clear to students, all grammar examples in `book_1_grammar/` and `book_2_dictionary/` follow the **Leipzig Glossing Rules**:
+
+1. **Three-Tier Format**:
+   - **Line 1 (Target Text)**: Original target language sentence with hyphenated morphemes.
+   - **Line 2 (Morpheme Gloss)**: Grammatical breakdown using standard Leipzig abbreviations (in small caps / uppercase).
+   - **Line 3 (Free Translation)**: Natural English translation in quotation marks.
+2. **Standard Abbreviations**:
+   - `NOM`: Nominative, `ACC`: Accusative, `DAT`: Dative, `GEN`: Genitive, `LOC`: Locative, `INS`: Instrumental
+   - `1SG` / `2SG` / `3SG`: First/Second/Third Person Singular
+   - `1PL` / `2PL` / `3PL`: First/Second/Third Person Plural
+   - `PST`: Past, `PRS`: Present, `FUT`: Future, `IPFV`: Imperfective, `PFV`: Perfective
+   - `CAUS`: Causative, `INCH`: Inchoative, `PASS`: Passive, `DEF`: Definite Article
+3. **Example**:
+   ```
+   Target:      Menkalin-an     log-ia          solv-ut-en.
+   Gloss:       computer-DEF.NOM logic-SG.ACC    solve-CAUS-PRS.3SG
+   Translation: "The computer calculates the logical problem."
+   ```
+
+### 5.3 Rich Dictionary Compilation (`book_2_dictionary/`)
+Book 2 compiles both:
+1. **Target-to-English Dictionary**: Each entry includes the headword, IPA pronunciation, grammatical inflection class, definition, etymology (root + affix breakdown), literal compound meaning, and an example sentence with an interlinear Leipzig gloss.
+2. **English-to-Target Reverse Index**: Alphabetized by English keyword for fast compositional lookup, cross-referencing the native etymological roots.
 
 ---
 
