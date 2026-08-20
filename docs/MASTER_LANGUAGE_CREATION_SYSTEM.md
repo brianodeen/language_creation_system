@@ -421,52 +421,69 @@ Book 2 compiles both:
 
 The compilation engine (`build_latex.py`) transforms Markdown source into print-ready PDF volumes.
 
-### 6.1 Geometry, Colors & Typography
-- **Trim Size**: 8" x 10" (`paperwidth=8in, paperheight=10in`).
-- **Color Palette**: Parchment background (`#FBF0D9`), Burgundy headers (`#800020`), Charcoal body text (`#222222`).
-- **Font Setup**: Primary font *Junicode* / *Charis SIL* at `8pt` base size for maximum dictionary density.
+### 6.1 Multi-Geometry Presets & Theme Styling
+The compiler supports dynamic paper formats and color themes via CLI arguments:
+*   **Paper Geometries (`--paper`)**:
+    *   `8x10`: Standard Personal Textbook (8" x 10" / default).
+    *   `a4`: ISO Standard A4 (210 x 297 mm).
+    *   `letter`: North American Standard US Letter (8.5" x 11").
+    *   `trade`: Trade Paperback (6" x 9").
+    *   `digest`: Digest Handbook (5.5" x 8.5").
+    *   `square`: Square Art / Illustrated Edition (8" x 8").
+*   **Theme Palettes (`--theme`)**:
+    *   `parchment`: Antique Parchment (`#FBF0D9`) + Burgundy (`#800020`) headers.
+    *   `modern`: Clean White (`#FFFFFF`) + Deep Navy (`#002B49`) accents.
+    *   `classic`: Soft Ivory (`#FDFBF7`) + Charcoal (`#1A1A1A`) typography.
+    *   `dark`: Dark Slate (`#1E1E1E`) + Royal Gold (`#D4AF37`) deluxe edition.
 
-### 6.2 Double-Column Dictionary Switching & `longtable` Isolation
-- **Problem**: 12,000 entries in single-column require 1,000+ pages. Switching to `\twocolumn\footnotesize` cuts page count by 45%. However, LaTeX `longtable` environments (used in prefaces/tables) **crash fatally** in two-column mode: `Package longtable Error: longtable not in 1-column mode`.
-- **Solution**: Keep title, prefaces, and IPA tables in single-column mode (`\onecolumn`), and dynamically insert `\twocolumn\footnotesize` right before the first dictionary section (`\section*{A}`).
+### 6.2 Strict Page Margin & Overflow Elimination
+To prevent text, code, or table cells from bleeding off the page edge:
+1.  **Proportional Column Math**: Table columns use `>{\RaggedRight\arraybackslash}p{...}` summing strictly to $\le 0.96\textwidth$ (e.g. 2-col: `0.28\textwidth` + `0.67\textwidth`; 3-col: `0.24\textwidth` + `0.28\textwidth` + `0.43\textwidth`).
+2.  **Flexible Header Wrapping**: Header cells use `{\small\bfseries Header}` instead of rigid `\textbf{Header}`, enabling multi-line text wrapping within cell boundaries.
+3.  **Global Paragraph Stretch**: Preambles include `\sloppy`, `\emergencystretch=3em`, and `\usepackage{microtype}` to dynamically adjust word spacing for long compound words.
+4.  **Automatic Code Wrapping**: Verbatim blocks use the `listings` package with `breaklines=true` and `breakatwhitespace=false`.
 
-```python
-def format_dictionary_columns(latex_content: str) -> str:
-    """Inserts two-column layout command immediately before alphabetical dictionary entries."""
-    return latex_content.replace(
-        r"\section*{A}",
-        "\\onecolumn\\clearpage\n\\twocolumn\n\\footnotesize\n\\section*{A}"
-    )
-```
-
-### 6.3 Header Cell Wrapping Fix (`{\small\bfseries cell}`)
-- **Problem**: Wrapping table header cells in `\textbf{Header}` creates rigid text boxes that ignore `\raggedright` paragraph wrapping, causing header cells to overflow printable margins and misalign with data rows.
-- **Solution**: Replace `\textbf{Header}` with `{\small\bfseries Header}`. `\bfseries` applies bold weight while preserving `\raggedright` wrapping boundaries.
+### 6.3 Double-Column Dictionary Switching & `longtable` Isolation
+*   **Problem**: 12,000 entries in single-column require 1,000+ pages. Switching to `\twocolumn\footnotesize` cuts page count by 45%. However, LaTeX `longtable` environments (used in prefaces/tables) **crash fatally** in two-column mode: `Package longtable Error: longtable not in 1-column mode`.
+*   **Solution**: Keep title, prefaces, and IPA tables in single-column mode (`\onecolumn`), and dynamically insert `\twocolumn\footnotesize` right before the first dictionary section (`\section*{A}`).
 
 ### 6.4 Windows Console UTF-8 & PDF File-Lock Safety Mechanisms
-- **Windows UTF-8 Fix**: Force stdout encoding at script start:
-  ```python
-  import sys
-  try:
-      sys.stdout.reconfigure(encoding='utf-8')
-  except AttributeError:
-      pass
-  ```
-- **PDF File-Lock Handler**: Prevent crashes when output PDFs are open in Acrobat/SumatraPDF during compilation:
-  ```python
-  import os
+*   **Windows UTF-8 Fix**: Force stdout encoding at script start:
+    ```python
+    import sys
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+    ```
+*   **PDF File-Lock Handler**: Prevent crashes when output PDFs are open in Acrobat/SumatraPDF during compilation:
+    ```python
+    import os
+    import shutil
 
-  def get_safe_pdf_output_path(pdf_path: str) -> str:
-      """If target PDF is locked by a viewer, fallback to a versioned filename."""
-      if os.path.exists(pdf_path):
-          try:
-              with open(pdf_path, 'r+b') as f:
-                  pass
-          except IOError:
-              base, ext = os.path.splitext(pdf_path)
-              return f"{base}_v2{ext}"
-      return pdf_path
-  ```
+    def get_safe_pdf_output_path(pdf_path: str) -> str:
+        """If target PDF is locked by a viewer, fallback to a versioned filename."""
+        if os.path.exists(pdf_path):
+            try:
+                with open(pdf_path, 'r+b') as f:
+                    pass
+            except IOError:
+                base, ext = os.path.splitext(pdf_path)
+                return f"{base}_v2{ext}"
+        return pdf_path
+    ```
+
+### 6.5 CLI Invocation Examples
+```bash
+# Standard compilation with default 8x10 parchment styling
+python scripts/build_latex.py
+
+# Trade paperback compilation in classic ivory styling for a sub-conlang
+python scripts/build_latex.py --dir mraow --lang "Mraow" --paper trade --theme classic
+
+# A4 modern white format with custom font families
+python scripts/build_latex.py --paper a4 --theme modern --font "Charis SIL" --ipa-font "Doulos SIL"
+```
 
 ---
 

@@ -23,10 +23,11 @@ language_creation_system/
 ├── docs/
 │   ├── CONLANG_ENGINEERING_MASTER_SPECIFICATION.md
 │   ├── master_language_generation_guide.md
-│   └── MASTER_LANGUAGE_CREATION_SYSTEM.md # Complete master engineering manual
+│   ├── MASTER_LANGUAGE_CREATION_SYSTEM.md # Complete master engineering manual
+│   └── PDF_ENGINE_INTEGRATION_NOTES.md   # PDF engine integration notes & margin safeguards
 ├── scripts/
 │   ├── build_books.py                     # Glossary injector & dictionary compiler
-│   ├── build_latex.py                     # Markdown-to-XeLaTeX PDF compiler
+│   ├── build_latex.py                     # Dynamic Markdown-to-XeLaTeX PDF compiler
 │   ├── phonetic_matcher.py                # 10-language family sound-fit matcher
 │   └── transcribe_ipa.py                  # Rule-based IPA phonetic transcriber CLI
 └── README.md
@@ -51,9 +52,18 @@ python scripts/phonetic_matcher.py
 
 ### 4. Compile Markdown Books to Print-Ready XeLaTeX PDFs
 ```bash
+# Standard 8x10 compilation with parchment theme
 python scripts/build_latex.py
+
+# Custom geometry (e.g. Trade 6x9, A4, Letter) and theme (parchment, modern, classic, dark)
+python scripts/build_latex.py --paper trade --theme classic
+
+# Compiling a sub-language directory (e.g. mraow)
+python scripts/build_latex.py --dir mraow --lang "Mraow" --author "Brian Odeen"
 ```
 
 ## Documentation
 
-Full detailed specification and step-by-step execution guides are available in [docs/MASTER_LANGUAGE_CREATION_SYSTEM.md](docs/MASTER_LANGUAGE_CREATION_SYSTEM.md).
+*   **Complete Master Specification**: [docs/MASTER_LANGUAGE_CREATION_SYSTEM.md](docs/MASTER_LANGUAGE_CREATION_SYSTEM.md)
+*   **PDF Engine Architecture & Margin Safeguards**: [docs/PDF_ENGINE_INTEGRATION_NOTES.md](docs/PDF_ENGINE_INTEGRATION_NOTES.md)
+*   **Conlang Engineering Guide**: [docs/CONLANG_ENGINEERING_MASTER_SPECIFICATION.md](docs/CONLANG_ENGINEERING_MASTER_SPECIFICATION.md)
